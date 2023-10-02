@@ -27,13 +27,22 @@ pub fn generate_random_32_bytes() -> BigUint {
     BigUint::from_bytes_be(&bytes)
 }
 
+
+/// This function is used to solve this challenge the verifier sends to the prover
+/// s = (k - c * x) mod p
 pub fn solve_challenge(
     rand_prover_k: &BigUint,
     secret_from_prover: &BigUint,
     rand_verifier_c: &BigUint,
     modulus: &BigUint
 ) -> BigUint {
+    let c_mul_x = rand_verifier_c * secret_from_prover;
 
+    if *rand_prover_k > c_mul_x {
+        (rand_prover_k - c_mul_x).modpow(&BigUint::one(), modulus)
+    } else {
+        q - (c_mul_x - rand_prover_k).modpow(&BigUint::one(), modulus)
+    }
 }
 
 pub fn verify_claim(

@@ -1,3 +1,4 @@
+use num::One;
 use num_bigint::BigUint;
 use rand::Rng;
 use sha256::digest;
@@ -41,7 +42,7 @@ pub fn solve_challenge(
     if *rand_prover_k > c_mul_x {
         (rand_prover_k - c_mul_x).modpow(&BigUint::one(), modulus)
     } else {
-        q - (c_mul_x - rand_prover_k).modpow(&BigUint::one(), modulus)
+        modulus - (c_mul_x - rand_prover_k).modpow(&BigUint::one(), modulus)
     }
 }
 
@@ -56,7 +57,9 @@ pub fn verify_claim(
     rand_verifier_c: &BigUint,
     prime: &BigUint,
 ) -> bool {
-    false
+    let first_condition = *r_one == (alpha.modpow(solution_from_prover, prime) * y_one.modpow(rand_verifier_c, prime)).modpow(&BigUint::one(), prime);
+    let second_condition = *r_two == (beta.modpow(solution_from_prover, prime) * y_two.modpow(rand_verifier_c, prime)).modpow(&BigUint::one(), prime);
+    first_condition && second_condition
 }
 
 #[cfg(test)]

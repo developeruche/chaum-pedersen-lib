@@ -1,3 +1,4 @@
+use num::One;
 use num::Num;
 use num::traits::FromBytes;
 use num_bigint::BigUint;
@@ -6,6 +7,8 @@ use crate::utils::{exponentiate, generate_random_32_bytes};
 pub mod utils; // this would hold the utils functions used through out the life-cycle of this lib
 
 
+
+#[derive(Debug)]
 pub struct SystemParameter {
     alpha: BigUint,
     beta: BigUint,
@@ -46,3 +49,35 @@ pub fn generate_interaction_one(
 }
 
 
+/// This function is used to solve this challenge the verifier sends to the prover
+/// s = (k - c * x) mod p
+pub fn solve_challenge(
+    rand_prover_k: &BigUint,
+    secret_from_prover: &BigUint,
+    rand_verifier_c: &BigUint,
+    modulus: &BigUint
+) -> BigUint {
+    let c_mul_x = rand_verifier_c * secret_from_prover;
+
+    if *rand_prover_k > c_mul_x {
+        (rand_prover_k - c_mul_x).modpow(&BigUint::one(), modulus)
+    } else {
+        modulus - (c_mul_x - rand_prover_k).modpow(&BigUint::one(), modulus)
+    }
+}
+
+pub fn verify_claim(
+    alpha: &BigUint,
+    beta: &BigUint,
+    r_one: &BigUint,
+    r_two: &BigUint,
+    y_one: &BigUint,
+    y_two: &BigUint,
+    solution_from_prover: &BigUint,
+    rand_verifier_c: &BigUint,
+    prime: &BigUint,
+) -> bool {
+    let first_condition = *r_one == (alpha.modpow(solution_from_prover, prime) * y_one.modpow(rand_verifier_c, prime)).modpow(&BigUint::one(), prime);
+    let second_condition = *r_two == (beta.modpow(solution_from_prover, prime) * y_two.modpow(rand_verifier_c, prime)).modpow(&BigUint::one(), prime);
+    first_condition && second_condition
+}

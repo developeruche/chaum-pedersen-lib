@@ -46,12 +46,12 @@ mod tests {
 
     #[test]
     fn test_expo() {
-        let num_ = BigUint::from(99u32);
-        let exp_ = BigUint::from(4u32);
-        let p_ = BigUint::from(1100u32);
+        let num_ = BigUint::from(3u32);
+        let exp_ = BigUint::from(300u32);
+        let p_ = BigUint::from(10009u32);
         let ex_res = exponentiate(&num_, &exp_, &p_);
 
-        assert_eq!(ex_res, BigUint::from(1001u32));
+        assert_eq!(ex_res, BigUint::from(6419u32));
     }
 
 
